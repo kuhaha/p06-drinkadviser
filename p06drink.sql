@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- ホスト: 127.0.0.1
--- 生成日時: 2016 年 12 月 20 日 11:08
+-- 生成日時: 2016 年 12 月 20 日 16:09
 -- サーバのバージョン: 5.5.27
 -- PHP のバージョン: 5.4.7
 
@@ -44,8 +44,8 @@ CREATE TABLE IF NOT EXISTS `tb_drink` (
 --
 
 INSERT INTO `tb_drink` (`dk_id`, `dk_name`, `dk_detail`, `color`, `taste`, `ingredients`, `alcohol`, `maker`, `price`) VALUES
-(1, 'ジントニック', '#鼻に抜ける爽やかな香りが特徴。 #スッキリとした口当たりに控えめな甘さがある。 #王道なスタンダードカクテル故に作り手により様々なバリエーションを見せる。 #バーテンダーの登竜門とも呼べるカクテル。 ', '赤', 'うす甘', '#ドライ・ジン #トニックウォーター #ライム（orレモン） ', 0, '', 560),
-(2, 'ジントニック', '#鼻に抜ける爽やかな香りが特徴。\r\n#スッキリとした口当たりに控えめな甘さがある。\r\n#王道なスタンダードカクテル故に作り手により様々なバリエーションを見せる。\r\n#バーテンダーの登竜門とも呼べるカクテル。\r\n', 'ピンク', '少々しぶみ', '#ドライ・ジン\r\n#トニックウォーター\r\n#ライム（orレモン）\r\n', 0, '', 1250);
+(1, 'ジントニック', '#鼻に抜ける爽やかな香りが特徴。 #スッキリとした口当たりに控えめな甘さがある。 #王道なスタンダードカクテル故に作り手により様々なバリエーションを見せる。 #バーテンダーの登竜門とも呼べるカクテル。 ', '赤', 'うす甘', '#ドライ・ジン #トニックウォーター #ライム（orレモン） ', 12, '', 560),
+(2, 'ジントニック', '#鼻に抜ける爽やかな香りが特徴。\r\n#スッキリとした口当たりに控えめな甘さがある。\r\n#王道なスタンダードカクテル故に作り手により様々なバリエーションを見せる。\r\n#バーテンダーの登竜門とも呼べるカクテル。\r\n', 'ピンク', '少々しぶみ', '#ドライ・ジン\r\n#トニックウォーター\r\n#ライム（orレモン）\r\n', 8, '', 1250);
 
 -- --------------------------------------------------------
 
@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS `tb_order` (
 --
 
 INSERT INTO `tb_order` (`oid`, `uid`, `od_tel`, `od_date`, `od_address`, `od_memo`, `status`) VALUES
-(1, 'k01', '03-1111-1111', '2016-12-02 16:03:43', '福岡県福岡市東区', 'お願いします', 0);
+(1, 'k01', '03-1111-1111', '2016-12-20 14:37:26', 'カウンター席No.14', 'お願いします', 1);
 
 -- --------------------------------------------------------
 
@@ -141,16 +141,15 @@ CREATE TABLE IF NOT EXISTS `tb_order_detail` (
   `memo` text,
   PRIMARY KEY (`odid`),
   UNIQUE KEY `odid` (`odid`)
-) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=4 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=12 ;
 
 --
 -- テーブルのデータのダンプ `tb_order_detail`
 --
 
 INSERT INTO `tb_order_detail` (`odid`, `oid`, `dk_id`, `qty`, `memo`) VALUES
-(1, 1, '1', 2, NULL),
-(2, 1, '2', 1, NULL),
-(3, 1, '1', 1, NULL);
+(8, 1, '2', 4, NULL),
+(11, 1, '1', 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -247,8 +246,8 @@ CREATE TABLE IF NOT EXISTS `vw_chumon` (
 ,`od_address` varchar(128)
 ,`od_memo` text
 ,`status` int(11)
-,`qty` decimal(32,0)
-,`money` decimal(42,0)
+,`qty` int(11)
+,`money` bigint(21)
 );
 -- --------------------------------------------------------
 
@@ -257,7 +256,7 @@ CREATE TABLE IF NOT EXISTS `vw_chumon` (
 --
 DROP TABLE IF EXISTS `vw_chumon`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_chumon` AS select `k`.`dk_id` AS `dk_id`,`k`.`dk_name` AS `dk_name`,`k`.`dk_detail` AS `dk_detail`,`k`.`color` AS `color`,`k`.`taste` AS `taste`,`k`.`ingredients` AS `ingredients`,`k`.`alcohol` AS `alcohol`,`k`.`maker` AS `maker`,`k`.`price` AS `price`,`o`.`oid` AS `oid`,`o`.`uid` AS `uid`,`o`.`od_tel` AS `od_tel`,`o`.`od_date` AS `od_date`,`o`.`od_address` AS `od_address`,`o`.`od_memo` AS `od_memo`,`o`.`status` AS `status`,sum(`d`.`qty`) AS `qty`,(`k`.`price` * sum(`d`.`qty`)) AS `money` from ((`tb_order` `o` join `tb_order_detail` `d`) join `tb_drink` `k`) where ((`o`.`oid` = `d`.`oid`) and (`d`.`dk_id` = `k`.`dk_id`)) group by `k`.`dk_id`;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `vw_chumon` AS select `k`.`dk_id` AS `dk_id`,`k`.`dk_name` AS `dk_name`,`k`.`dk_detail` AS `dk_detail`,`k`.`color` AS `color`,`k`.`taste` AS `taste`,`k`.`ingredients` AS `ingredients`,`k`.`alcohol` AS `alcohol`,`k`.`maker` AS `maker`,`k`.`price` AS `price`,`o`.`oid` AS `oid`,`o`.`uid` AS `uid`,`o`.`od_tel` AS `od_tel`,`o`.`od_date` AS `od_date`,`o`.`od_address` AS `od_address`,`o`.`od_memo` AS `od_memo`,`o`.`status` AS `status`,`d`.`qty` AS `qty`,(`k`.`price` * `d`.`qty`) AS `money` from ((`tb_order` `o` join `tb_order_detail` `d`) join `tb_drink` `k`) where ((`o`.`oid` = `d`.`oid`) and (`d`.`dk_id` = `k`.`dk_id`));
 
 --
 -- ダンプしたテーブルの制約
