@@ -17,13 +17,15 @@ if(isset($_POST['dk_id'])){
     $cart_id = mysql_insert_id();
   }
   if ($cart_id > 0){
-    if (isset($_POST['oid'])){//再計算
-      $oid =  $_POST['oid'];
-      $sql = "delete from tb_order_detail where oid={$oid} and dk_id={$dk_id}";
+    if (isset($_POST['odid'])){//再計算
+      $odid =  $_POST['odid'];
+      if ($qty==0){
+        $sql = "delete from tb_order_detail where odid={$odid}";
+      }else{
+         $sql = "update tb_order_detail set qty={$qty} where odid={$odid}";
+      }
       $rs = mysql_query($sql, $conn);
-    }
-
-    if ($qty > 0){
+    }else if ($qty > 0){
       $sql ='insert into tb_order_detail(oid,dk_id,qty) values';
       $sql .= "(" .$cart_id .",'". $dk_id . "',".$qty.")";
       $rs = mysql_query($sql, $conn);
@@ -31,7 +33,7 @@ if(isset($_POST['dk_id'])){
     }
   }
 }
-$sql = "select * from vw_chumon1 where oid={$cart_id} and status=0";
+$sql = "select * from vw_chumon where oid={$cart_id} and status=0";
 
 $rs = mysql_query($sql, $conn);
 if (!$rs) die('エラー: ' . mysql_error());
@@ -51,7 +53,7 @@ while ($row) {
   echo '<td>' ;
   echo '<form class="form-inline" action="cart.php" method="post">';
   echo '<input type="hidden" name="dk_id" value="' .$row['dk_id']. '">';
-  echo '<input type="hidden" name="oid" value="' .$row['oid']. '">';
+  echo '<input type="hidden" name="odid" value="' .$row['odid']. '">';
   echo changeQty(0,5, $row['qty']);
   echo '<input class="btn btn-default" type="submit" value="再計算">';
   echo  '</form>';
